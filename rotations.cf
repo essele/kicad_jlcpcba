@@ -33,6 +33,12 @@
 ^VSSOP-10_-         270
 
 #
+# Polarised caps are 180 out
+#
+^CP_Elec_           180
+^CP_EIA-            180
+
+#
 # Long name matches
 #
 #^Lees_Footprints:   270
