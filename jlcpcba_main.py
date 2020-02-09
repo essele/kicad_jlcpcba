@@ -226,9 +226,9 @@ def create_pcba():
         fpshort = footprint.split(':')[1]
         fh = topfh
         lname = "top"
+        y = y * -1                  # y is negative always???
         if (smd):
-            if (layer == "B.Cu"):   # negatives for bottom layer
-                y = y * -1
+            if (layer == "B.Cu"):   
                 fh = botfh
                 lname = "bottom"
 
