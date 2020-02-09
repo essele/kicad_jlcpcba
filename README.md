@@ -21,9 +21,9 @@ The from within the pcb editor you can click on the JLCPCB action button (or use
 
 This will generate two files in the project directory:
 
-<name>_bom.csv          -- the BOM file
-<name>_top_pos.csv      -- the placement file for the top of the board
-<name>_bottom_pos.csv   -- the placement file for the bottom of the board
+projectname_bom.csv          - the BOM file
+projectname_top_pos.csv      - the placement file for the top of the board
+projectname_bottom_pos.csv   - the placement file for the bottom of the board
 
 These files can be uploaded to the JLCPCB PCBA page when requested, if the rotations are not correct then you can edit rotations.cf and recreate/reupload the files.
 
