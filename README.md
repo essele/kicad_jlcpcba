@@ -5,17 +5,32 @@ This is a very simple plugin that builds the required BOM and Placement files fo
 
 It works by reading in the schematic to build up the LCSC part numbers, and then matching with the components that are on the pcb.
 
-Currently custom rotations are hardcoded into the script, so ideally these will need to come out.
+Custom rotations (needed to ensure components end up the right orientation for the service) are contained in rotations.cf and are read each time the action is run, so you can edit as needed and retry until everything is good.
+
+Please feedback any changed needed to the rotations.
 
 INSTALL
 
 To install simply git clone into your plugins directory.
 
+USAGE
+
+Simply ensure that any components you want placed by the JLC service have an extra attribute in the schematic called "LCSC", and the value should be the LCSC part number, this is used to pull part number details out.
+
+The from within the pcb editor you can click on the JLCPCB action button (or use the external plugins menu) to run the action.
+
+This will generate two files in the project directory:
+
+<name>_bom.csv          -- the BOM file
+<name>_top_pos.csv      -- the placement file for the top of the board
+<name>_bottom_pos.csv   -- the placement file for the bottom of the board
+
+These files can be uploaded to the JLCPCB PCBA page when requested, if the rotations are not correct then you can edit rotations.cf and recreate/reupload the files.
+
 TODO
 
 Still todo:
 
-- Separate file for custom rotations
 - More error checking
-- More detailed instructions
+- More detailed instructions with pictures
 

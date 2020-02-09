@@ -11,35 +11,39 @@ import pcbnew
 import os
 import re
 
-print("Hello")
-
 #
 # Setup a few useful globals...
 #
 global path
 global name
+global rotdb
 
 #
-# Expressions with a colon in them will be matched against
-# the full footprint name (including library alias), otherwise
-# it's just the short name.
+# Read the rotations.cf config file so we know what rotations to apply
+# later.
 #
-# TODO: these need to come from a config file (ideally git updated)
-#
-rots = [
-            ('^SOT-223',            180),
-            ('^SOT-23',             180),
-            ('^SOT-353',            180),
-            ('^QFN-',               270),
-            ('^LQFP-',              270),
-            ('^TQFP-',              270),
-            ('^MSOP-',              90),
-            ('^TSSOP-',             270),
-            ('^DFN-',               270),
-            ('^SOIC-8_',            270),
-            ('^VSSOP-10_-',         270),
-#            ('^Lees_Footprints:',   270),
-        ]
+def read_rotdb(filename):
+    db = []
+
+    fh = open(filename, "r")
+    for line in fh:
+        line = line.rstrip()
+
+        line = re.sub('#.*$', '', line)         # remove anything after a comment
+        line = re.sub('\s*$', '', line)         # remove all trailing space
+
+        if (line == ""):
+            continue
+
+        m = re.match('^([^\s]+)\s+(\d+)$', line)
+        if m:
+            db.append((m.group(1), int(m.group(2))))
+
+        print(line)
+    return db
+
+
+
 
 #
 # Given the footprint name, work out what rotation is needed, we support
@@ -49,7 +53,7 @@ rots = [
 def possible_rotate(footprint):
     fpshort = footprint.split(':')[1]
 
-    for rot in rots:
+    for rot in rotdb:
         ex = rot[0]
         delta = rot[1]
 
@@ -132,8 +136,6 @@ def create_bom(schfile):
             items[item['uid']] = item
 
     fh.close()
-    print("ALL ITEMS")
-    print(items)
 
     #
     # Now we can create the BOM by grouping...
@@ -143,7 +145,6 @@ def create_bom(schfile):
 
     for i in items.values():
         key = i['value'] + "//" + i['footprint'] + "//" + i['lcsc']
-        print("have key -- " + key)
 
         if (not key in uniq):
             uniq[key] = []
@@ -164,19 +165,28 @@ def create_bom(schfile):
     fh.close()
     return items
 
-def create():
+#
+# Actually create the PCBA files...
+#
+def create_pcba():
     global path
     global name
+    global rotdb
 
     board = pcbnew.GetBoard()
     boardfile = board.GetFileName()
     path = os.path.dirname(boardfile)
     name = os.path.splitext(os.path.basename(boardfile))[0]
+
+    #
+    # Populate the rotation db (do it here so editing and retrying is easy)
+    #
+    rotdb = read_rotdb(os.path.join(os.path.dirname(__file__), 'rotations.cf'))
+
     #
     # Create the BOM and build the refdb...
     #
     refdb = create_bom(path + "/" + name + ".sch")
-
     #
     # Now we can process all of the SMT elements...
     #

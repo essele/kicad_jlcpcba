@@ -17,7 +17,7 @@ class JlcpcbaPluginAction(pcbnew.ActionPlugin):
     def Run(self):
         print("Testing")
         try:
-            create()
+            create_pcba()
             wx.MessageDialog(None, "All Done").ShowModal()
         except Exception as e:
             import os
