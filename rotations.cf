@@ -22,11 +22,13 @@
 #
 ^SOT-223            180
 ^SOT-23             180
+^TSOT-23             180
 ^SOT-353            180
-^QFN-               270
+^QFN-               90 
+^qfn-               90 
 ^LQFP-              270
 ^TQFP-              270
-^MSOP-              90
+^MSOP-              270
 ^TSSOP-             270
 ^DFN-               270
 ^SOIC-8_            270

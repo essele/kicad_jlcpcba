@@ -133,7 +133,8 @@ def create_bom(schfile):
             if (not "lcsc" in item):
                 item['lcsc'] = ""
 
-            items[item['uid']] = item
+	    # convert uids to lowercase
+            items[item['uid'].lower()] = item
 
     fh.close()
 
@@ -201,7 +202,12 @@ def create_pcba():
     botfh.write("Designator,Val,Package,Mid X,Mid Y,Rotation,Layer\n")
 
     for m in board.GetModules():
-        uid = m.GetPath().replace('/', '')
+        #uid = m.GetPath().replace('/', '')
+	# Need to just pull out the non-zero part at the end
+	uid = m.GetPath().AsString().lower()
+	while (uid[0] in "0/-"):
+		uid = uid[1:]
+
         smd = ((m.GetAttributes() & pcbnew.MOD_CMS) == pcbnew.MOD_CMS)
         x = m.GetPosition().x/1000000.0
         y = m.GetPosition().y/1000000.0
