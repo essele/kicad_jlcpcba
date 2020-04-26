@@ -204,7 +204,11 @@ def create_pcba():
     for m in board.GetModules():
         #uid = m.GetPath().replace('/', '')
 	# Need to just pull out the non-zero part at the end
-	uid = m.GetPath().AsString().lower()
+	if hasattr(m.GetPath(), 'AsString'):
+		uid = m.GetPath().AsString().lower()
+	else:
+		uid = m.GetPath().lower()
+
 	while (uid[0] in "0/-"):
 		uid = uid[1:]
 
