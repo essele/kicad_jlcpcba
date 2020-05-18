@@ -203,14 +203,14 @@ def create_pcba():
 
     for m in board.GetModules():
         # uid = m.GetPath().replace('/', '')
-		# Need to just pull out the non-zero part at the end
-		if hasattr(m.GetPath(), 'AsString'):
-			uid = m.GetPath().AsString().lower()
-		else:
-			uid = m.GetPath().lower()
+        # Need to just pull out the non-zero part at the end
+        if hasattr(m.GetPath(), 'AsString'):
+            uid = m.GetPath().AsString().lower()
+        else:
+            uid = m.GetPath().lower()
 
-    while (uid[0] in "0/-"):
-        uid = uid[1:]
+        while (uid[0] in "0/-"):
+            uid = uid[1:]
 
         smd = ((m.GetAttributes() & pcbnew.MOD_CMS) == pcbnew.MOD_CMS)
         x = m.GetPosition().x/1000000.0
