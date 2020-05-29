@@ -11,6 +11,8 @@ import pcbnew
 import os
 import re
 
+import read_sch as bom
+
 #
 # Setup a few useful globals...
 #
@@ -67,106 +69,6 @@ def possible_rotate(footprint):
     return 0
 
 #
-# Function to read the schematic, create a grouped BOM file, and also keep
-# an internal table for use by the later code
-#
-def create_bom(schfile):
-
-    gotonext = False
-    items = {}
-    item = {}
-
-    fh = open(schfile, "r")
-    for line in fh:
-        line = line.rstrip()
-        print(line)
-
-        # Start of an item...
-        if (re.match('^\$Comp$', line)):
-            item = {}
-            continue
-
-        # We care about unit 1...
-        m = re.match('^U (\d+) (\d+) ([^\s]+)', line)
-        if (m):
-            if (m.group(1) != '1'):
-                gotonext = True
-                continue
-
-            item['uid'] = m.group(3)
-            gotonext = False
-            continue
-
-        # We only get past here if we are processing a unit 1 item
-        if (gotonext):
-            continue
-
-        # Pull out the reference...
-        m = re.match('^F 0 "([^"]+)"', line)
-        if (m):
-            item['reference'] = m.group(1)
-            continue
-
-        # Pull out the value...
-        m = re.match('^F 1 "([^"]+)"', line)
-        if (m):
-            item['value'] = m.group(1)
-            continue
-
-        # Pull out the footprint...
-        m = re.match('^F 2 "([^"]+)"', line)
-        if (m):
-            item['footprint'] = m.group(1)
-            continue
-
-        # Pull out the LCSC part number...
-        m = re.match('^F \d+ "([^"]+)" .* "LCSC"$', line)
-        if (m):
-            item['lcsc'] = m.group(1)
-            continue
-
-        # Store it if it looks ok at the end
-        if (re.match('^\$EndComp$', line)):
-            if (not "footprint" in item):
-                continue
-
-            if (not "lcsc" in item):
-                item['lcsc'] = ""
-
-        # convert uids to lowercase
-            items[item['uid'].lower()] = item
-
-    fh.close()
-
-    #
-    # Now we can create the BOM by grouping...
-    #
-    bom = []
-    uniq = {}
-
-    for i in items.values():
-        key = i['value'] + "//" + i['footprint'] + "//" + i['lcsc']
-
-        if (not key in uniq):
-            uniq[key] = []
-
-        uniq[key].append(i['reference'])
-
-    #
-    # Now output the BOM in JLCPCB format...
-    #
-    bomfile=path + "/" + name + "_bom.csv"
-    fh = open(bomfile, "w")
-    fh.write("Comment,Designator,Footprint,LCSC\n")
-    for k in uniq.keys():
-        (value, footprint, lcsc) = re.split("//", k)
-        refs = ",".join(uniq[k])
-        fh.write('"'+value+'","'+refs+'","'+footprint+'","'+lcsc+'"\n')
-
-    fh.close()
-    return items
-
-#
 # Actually create the PCBA files...
 #
 def create_pcba():
@@ -187,7 +89,11 @@ def create_pcba():
     #
     # Create the BOM and build the refdb...
     #
-    refdb = create_bom(path + "/" + name + ".sch")
+    bom.init()
+    bom.read_sch(path + "/" + name + ".sch")
+    bom.output(path + "/" + name + "_bom.csv")
+    refdb = bom.REFDB
+    
     #
     # Now we can process all of the SMT elements...
     #
