@@ -62,12 +62,9 @@ def read_sch(schfile, spath=""):
             item = {}
             continue
 
-        # We care about unit 1...
+        # We care about all units...
         m = re.match('^U (\d+) (\d+) ([^\s]+)', line)
         if (m):
-            if (m.group(1) != '1'):
-                gotonext = True
-                continue
             item['uid'] = m.group(3)
             gotonext = False
             continue
