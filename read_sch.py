@@ -73,8 +73,13 @@ def read_sch(schfile, spath=""):
         if (gotonext):
             continue
 
-        # There are two ways to find a reference. If we have no spath then
-        # we use the "F 0" field, otherwise we look for an AR Path that matches
+        # New approach to finding a reference:
+        #
+        # If we are not in a subsheet (no spath) then we just use "F 0".
+        #
+        # If we are in a subsheet (have spath) then we see if we have a matching
+        # AR Path, otherwise we fall back to using "F 0", this caters for the
+        # situation where a subsheet is only used once and has no AR Path.
         if (spath):
             # The AR Path version...
             m = re.match('^AR Path="([^"]+)" Ref="([^"]+)".*', line)
@@ -83,8 +88,9 @@ def read_sch(schfile, spath=""):
                     item['reference'] = m.group(2)
                     item['uid'] = m.group(1)
                 continue
-        else:
-            # The normal version...
+
+        if (not "reference" in item):
+            # The normal version... if we haven't already matched
             m = re.match('^F 0 "([^"]+)"', line)
             if (m):
                 item['reference'] = m.group(1)

@@ -39,6 +39,7 @@
 # Polarised caps are 180 out
 #
 ^CP_Elec_           180
+^C_Elec_            180
 ^CP_EIA-            180
 
 #
