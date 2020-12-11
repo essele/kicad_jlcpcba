@@ -7,11 +7,11 @@
 # and then cross-matching the pcb modules.
 #
 
-import pcbnew
 import os
+import pcbnew
 import re
 
-import read_sch as bom
+from . import read_sch as bom
 
 #
 # Setup a few useful globals...
