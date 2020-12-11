@@ -115,6 +115,9 @@ def create_pcba():
         else:
             uid = m.GetPath().lower()
 
+        if len(uid) == 0:
+            continue
+
         while (uid[0] in "0/-"):
             uid = uid[1:]
 
