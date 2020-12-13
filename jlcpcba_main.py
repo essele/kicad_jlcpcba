@@ -7,11 +7,11 @@
 # and then cross-matching the pcb modules.
 #
 
-import pcbnew
 import os
+import pcbnew
 import re
 
-import read_sch as bom
+from . import read_sch as bom
 
 #
 # Setup a few useful globals...
@@ -114,6 +114,9 @@ def create_pcba():
             uid = m.GetPath().AsString().lower()
         else:
             uid = m.GetPath().lower()
+
+        if len(uid) == 0:
+            continue
 
         while (uid[0] in "0/-"):
             uid = uid[1:]
